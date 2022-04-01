@@ -16,7 +16,7 @@ variable "bucketname" {
 
 }
 
-## You need to use the following content_type, otherwise you will get an error while loading the website.
+## You need to use the following content_type, otherwise, you will get an error while loading the website.
 
 variable "mime_types" {
   default = {
