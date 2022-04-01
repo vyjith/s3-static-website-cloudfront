@@ -1,21 +1,19 @@
-variable "region" {}
+variable "region" {
+}
 
+variable "access_key" {
+}
 
-variable "access_key" {}
-
-variable "secret_key" {}
-
+variable "secret_key" {
+    
+}
 
 variable "project" {
-
-    default = "bucket"
-  
+    
 }
 
 variable "bucketname" {
 
-  default = "s3neww.vyjithks.tk"
-  
 }
 
 variable "mime_types" {
@@ -39,18 +37,12 @@ variable "mime_types" {
  
  variable "default_root" {
 
-   default = "index.html"
-   
  }
 
  variable "price" {
 
-   default = "PriceClass_200"
-   
- }
+}
 
  variable "acmarn" {
 
-   default = "arn:aws:acm:us-east-1:370200737204:certificate/7423ac28-40cf-42bc-b322-90db06fd95fb"
-   
- }
+}
