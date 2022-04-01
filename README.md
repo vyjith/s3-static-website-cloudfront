@@ -32,4 +32,15 @@ If you need to download terraform , then click here [Terraform](https://www.terr
 
 Lets create a file for declaring the variables.This is used to declare the variable and the values are passing through the terrafrom.tfvars file.
 
+## Create a varriable.tf file
 
+```
+variable "region" {}
+variable "access_key" {}
+variable "secret_key" {}
+variable "project" {}
+variable "bucketname" {}
+variable "default_root" {}
+variable "price" {}
+variable "acmarn" {}
+```
