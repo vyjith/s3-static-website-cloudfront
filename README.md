@@ -1,6 +1,8 @@
 # Creating s3 bucket and cloudfront using terraform to host a static website
 -------------------------------------------------- 
 
+[![Builds](https://travis-ci.org/joemccann/dillinger.svg?branch=master)](https://travis-ci.org/joemccann/dillinger)
+
 # Description
 -------------------------------------------------- 
 
@@ -34,7 +36,7 @@ Lets create a file for declaring the variables.This is used to declare the varia
 
 ## Create a varriable.tf file
 
-```
+```sh
 variable "region" {}
 variable "access_key" {}
 variable "secret_key" {}
@@ -47,7 +49,7 @@ variable "acmarn" {}
 
 ## Create a provider.tf file
 
-```
+```sh
 provider "aws" {
   region     = var.region
   access_key = var.access_key
@@ -57,7 +59,7 @@ provider "aws" {
 
 ## Create a terraform.tfvars file
 
-```
+```sh
 region = "Put-your-region-here"
 access_key = "Put-your-access_key-here"
 secret_key = "Put-your-secretkey-here"
@@ -73,7 +75,7 @@ terraform init
 ```
 **Lets start with main.tf file, the details are below**
 > To creat s3 bukcet
-```
+```sh
 resource "aws_s3_bucket" "mybucket" {
   bucket = var.bucketname
 
@@ -84,7 +86,7 @@ resource "aws_s3_bucket" "mybucket" {
 ```
 
 > To create an acl permission for the created bukcet
-```
+```sh
 resource "aws_s3_bucket_acl" "bucketacl" {
   bucket = aws_s3_bucket.mybucket.id
   acl    = "private"
@@ -92,7 +94,7 @@ resource "aws_s3_bucket_acl" "bucketacl" {
 ```
 
 > Gather the policy for the bucket
-```
+```sh
 data "aws_iam_policy_document" "s3_policy" {
   statement {
     actions   = ["s3:GetObject"]
@@ -106,7 +108,7 @@ data "aws_iam_policy_document" "s3_policy" {
 }
 ```
 >  To attach the policy to the bucket
-```
+```sh
 resource "aws_s3_bucket_policy" "allow_access_from_another_account" {
   bucket = aws_s3_bucket.mybucket.id
   policy = data.aws_iam_policy_document.s3_policy.json
@@ -115,7 +117,7 @@ resource "aws_s3_bucket_policy" "allow_access_from_another_account" {
 
 >  To upload the website file
 
-```
+```sh
 resource "aws_s3_object" "object" {
 for_each = fileset("myfiles/", "**")
 bucket = aws_s3_bucket.mybucket.id
@@ -127,16 +129,16 @@ content_type = lookup(tomap(var.mime_types), element(split(".", each.key), lengt
 ```
 
 > Gather zone ID of my donmain from route 53
-```
+```sh
 data "aws_route53_zone" "selected" {
-  name         = "vyjithks.tk."
+  name         = "domain.com."
   private_zone = false
 }
 ```
 
 > To creata an alias record for the cloud front
 
-```
+```sh
 resource "aws_route53_record" "cloudfront" {
   zone_id = data.aws_route53_zone.selected.id
   name    = "${var.project}.${data.aws_route53_zone.selected.name}"
@@ -151,7 +153,7 @@ resource "aws_route53_record" "cloudfront" {
 ```
 
 > To create cloudfront for my bucket
-```
+```sh
 locals {
   
   s3_origin_id = "s3.ap-south-1.amazonaws.com"
@@ -215,3 +217,51 @@ resource "aws_cloudfront_distribution" "website_cdnnew" {
 }
 
 ```
+## Create an output.tf for getting terrafrom output.
+
+```sh
+output "s3-website-endpont" {
+
+    value = aws_s3_bucket.mybucket.website_endpoint
+  
+}
+
+output "s3-bukcet-arn" {
+
+
+    value = aws_s3_bucket.mybucket.arn
+
+}
+
+output "cloudfront-url" {
+
+    value = "https://${aws_route53_record.cloudfront.name}"
+  
+}
+```
+Lets validate the terraform files using
+
+```
+terraform validate
+```
+
+Lets plan the architecture and verify once again
+
+```
+terraform plan
+```
+
+Lets apply the above architecture to the AWS.
+
+```
+terraform apply
+```
+## Conclusion
+
+This is a simple static s3 website and cloudfront using terraform. Please contact me when you encounter any difficulty error while using this terrform code. Thank you!
+
+### ⚙️ Connect with Me
+<p align="center">
+<a href="https://www.instagram.com/iamvyjith/"><img src="https://img.shields.io/badge/Instagram-E4405F?style=for-the-badge&logo=instagram&logoColor=white"/></a>
+<a href="https://www.linkedin.com/in/vyjith-ks-3bb8b7173/"><img src="https://img.shields.io/badge/LinkedIn-0077B5?style=for-the-badge&logo=linkedin&logoColor=white"/></a>
+
