@@ -1,18 +1,9 @@
-variable "region" {
-
-  default = "ap-south-1"
-}
+variable "region" {}
 
 
-variable "access_key" {
+variable "access_key" {}
 
-  default = "AKIAVMMNO6W2N5ZQGAUT"
-}
-
-variable "secret_key" {
-
-  default = "s5l4plsmcZh/7myOH0+ce6cItkX+bP4zm6NeMGde"
-}
+variable "secret_key" {}
 
 
 variable "project" {
