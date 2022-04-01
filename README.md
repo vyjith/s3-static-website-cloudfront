@@ -164,7 +164,7 @@ resource "aws_cloudfront_origin_access_identity" "bucketoai" {
 resource "aws_cloudfront_distribution" "website_cdnnew" {
   origin {
     domain_name = aws_s3_bucket.mybucket.bucket_regional_domain_name
-    origin_id   = "${aws_s3_bucket.mybucket.id}-locals.s3_origin_id"
+    origin_id   = "${aws_s3_bucket.mybucket.id}-local.s3_origin_id"
     
     s3_origin_config {
       origin_access_identity = aws_cloudfront_origin_access_identity.bucketoai.cloudfront_access_identity_path
