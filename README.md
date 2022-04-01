@@ -131,7 +131,7 @@ content_type = lookup(tomap(var.mime_types), element(split(".", each.key), lengt
 }
 ```
 
-> Gather zone ID of my donmain from route 53
+> Gather zone ID of my domain from route 53
 ```sh
 data "aws_route53_zone" "selected" {
   name         = "domain.com."
