@@ -122,11 +122,11 @@ resource "aws_s3_bucket_policy" "allow_access_from_another_account" {
 
 ```sh
 resource "aws_s3_object" "object" {
-for_each = fileset("${/path}/", "**")
+for_each = fileset("${/path}", "**")
 bucket = aws_s3_bucket.mybucket.id
 key = each.value
-source = "${/path}/${each.value}"
-etag = filemd5("${/path}/${each.value}")
+source = "${/path}${each.value}"
+etag = filemd5("${/path}${each.value}")
 content_type = lookup(tomap(var.mime_types), element(split(".", each.key), length(split(".", each.key)) - 1))
 }
 ```
