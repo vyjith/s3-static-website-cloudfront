@@ -125,8 +125,8 @@ resource "aws_s3_object" "object" {
 for_each = fileset("myfiles/", "**")
 bucket = aws_s3_bucket.mybucket.id
 key = each.value
-source = "myfiles/${each.value}"
-etag = filemd5("myfiles/${each.value}")
+source = "${/path}/${each.value}"
+etag = filemd5("${/path}/${each.value}")
 content_type = lookup(tomap(var.mime_types), element(split(".", each.key), length(split(".", each.key)) - 1))
 }
 ```
