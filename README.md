@@ -13,6 +13,9 @@ For a long time, s3 has been an excellent choice for hosting static websites, bu
 
 Hosting a static website on S3 only requires a few components. This setup creates the following resources:
 
+
+![](https://i.ibb.co/3kj44G7/s3cloudfront-drawio.png)
+
 * S3 bucket for the website files
 * Cloudfront distribution as CDN
 * Route53 records for the given domain
