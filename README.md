@@ -1,150 +1,35 @@
-# static-website-cloudfront
-static-website-cloudfront
+# Creating s3 bucket and cloudfront using terraform to host a static website
+-------------------------------------------------- 
+
+# Description
+-------------------------------------------------- 
+
+For a long time, s3 has been an excellent choice for hosting static websites, but it's still a hassle to set up manually, To establish and manage users, buckets, certificates, a CDN, and roughly a hundred additional configuration choices, you must navigate through dozens of pages in the AWS console, it quickly becomes tiresome if you do this repeatedly. Terraform, a well-known "Infrastructure as code" tool, allows us to create resources (such as instances, storage buckets, users, rules, and DNS records)
+
+## S3 static website Infrastructure
+-------------------------------------------------- 
+
+Hosting a static website on S3 only requires a few components. This setup creates the following resources:
+
+* S3 bucket for the website files
+* Cloudfront distribution as CDN
+* Route53 records for the given domain
 
 
-```
-# -------------------------------------------------- 
-# S3 bucket creation
-# -------------------------------------------------- 
+## Prerequisites
+-------------------------------------------------- 
 
-resource "aws_s3_bucket" "mybucket" {
-  bucket = var.bucketname
+Before we get started you are going to need so basics:
 
-  tags = {
-    Name        = var.project
-  }
-}
+* [Basic knowledge of Terraform](https://registry.terraform.io/providers/hashicorp/aws/latest/docs)
+* [Terraform installed](https://www.terraform.io/downloads)
+* [Valid AWS IAM user credentials with required access](https://docs.aws.amazon.com/IAM/latest/UserGuide/id_users_create.html)
+* [A purchased domain](https://mailchimp.com/resources/how-to-buy-a-domain-name/)
 
-# -------------------------------------------------- 
-# Acl website permission
-# -------------------------------------------------- 
+## Installation
 
-resource "aws_s3_bucket_acl" "bucketacl" {
-  bucket = aws_s3_bucket.mybucket.id
-  acl    = "private"
-}
+If you need to download terraform , then click here [Terraform](https://www.terraform.io/downloads) .
 
-# -------------------------------------------------- 
-# Acl website permission
-# -------------------------------------------------- 
-
-resource "aws_s3_bucket_policy" "allow_access_from_another_account" {
-  bucket = aws_s3_bucket.mybucket.id
-  policy = data.aws_iam_policy_document.s3_policy.json
-
-}
-
-# -------------------------------------------------- 
-# Website configration 
-# -------------------------------------------------- 
-
-resource "aws_s3_bucket_website_configuration" "website" {
-  bucket = aws_s3_bucket.mybucket.id
-
-  index_document {
-    suffix = "index.html"
-  }
-
-  error_document {
-    key = "error.html"
-  }
-
-}
-
-# -------------------------------------------------- 
-# Website uploading files
-# -------------------------------------------------- 
-
-resource "aws_s3_object" "object" {
-for_each = fileset("myfiles/", "**")
-bucket = aws_s3_bucket.mybucket.id
-key = each.value
-source = "myfiles/${each.value}"
-etag = filemd5("myfiles/${each.value}")
-content_type = lookup(tomap(var.mime_types), element(split(".", each.key), length(split(".", each.key)) - 1))
-}
-
-# -------------------------------------------------- 
-# Adding-records
-# -------------------------------------------------- 
-
-resource "aws_route53_record" "cloudfront" {
-  zone_id = data.aws_route53_zone.selected.id
-  name    = "${var.project}.${data.aws_route53_zone.selected.name}"
-  type    = "A"
-
-  alias {
-    name    =  aws_cloudfront_distribution.website_cdnnew.domain_name
-    zone_id = "${aws_cloudfront_distribution.website_cdnnew.hosted_zone_id}"
-    evaluate_target_health = false
-  }
-}
-
-# -------------------------------------------------- 
-# Creating could front distribution for s3 static website
-# -------------------------------------------------- 
-
-locals {
-  
-  s3_origin_id = "s3.ap-south-1.amazonaws.com"
-}
-
-resource "aws_cloudfront_origin_access_identity" "bucketoai" {
-  comment = "Neww_access"
-}
-
-resource "aws_cloudfront_distribution" "website_cdnnew" {
-  origin {
-    domain_name = aws_s3_bucket.mybucket.bucket_regional_domain_name
-    origin_id   = "${aws_s3_bucket.mybucket.id}-locals.s3_origin_id"
-    
-    s3_origin_config {
-      origin_access_identity = aws_cloudfront_origin_access_identity.bucketoai.cloudfront_access_identity_path
-    }
-  }
-  aliases = ["${var.project}.${data.aws_route53_zone.selected.name}"]
-
-  enabled             = true
-  is_ipv6_enabled     = false
-  default_root_object = var.default_root
-  http_version = "http2"
-  price_class = var.price
-    
-
-  default_cache_behavior {
-    allowed_methods  = ["DELETE", "GET", "HEAD", "OPTIONS", "PATCH", "POST", "PUT"]
-    cached_methods   = ["GET", "HEAD"]
-    target_origin_id = "${aws_s3_bucket.mybucket.id}-locals.s3_origin_id"
-
-    forwarded_values {
-      query_string = false
-
-      cookies {
-        forward = "none"
-      }
-    }
-    min_ttl                = 0
-    default_ttl            = 300
-    max_ttl                = 1200
-    compress               = true
-
-    viewer_protocol_policy = "redirect-to-https"
-
-  }
-  restrictions {
-    geo_restriction {
-      
-      restriction_type = "none"
-
-    }
-  }
-  viewer_certificate {
-    acm_certificate_arn = var.acmarn
-    ssl_support_method = "sni-only"
-    minimum_protocol_version = "TLSv1"
-
-  }
-}
+Lets create a file for declaring the variables.This is used to declare the variable and the values are passing through the terrafrom.tfvars file.
 
 
-```
